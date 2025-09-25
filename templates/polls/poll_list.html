@@ -1,5 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Опитування{% endblock %}
 {% block content %}
-
+    <h1 class="my-4">Опитування</h1>
+    <p class="text-muted">Беріть участь у опитуваннях, щоб висловити свою думку. Кожен може проголосувати лише один раз.</p>
+    {% if polls %}
+        <ul class="list-group mb-4">
+            {% for poll in polls %}
+                <li class="list-group-item">
+                    <a href="{% url 'polls:poll_detail' poll.pk %}">{{ poll.title }}</a>
+                    <small class="text-muted">Створено: {{ poll.created_at|date:"d.m.Y H:i" }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="alert alert-info">Наразі немає активних опитувань.</p>
+    {% endif %}
+    {% if user.is_authenticated and user.profile.role in 'admin,moderator' %}
+        <a href="#" class="btn btn-primary">Створити опитування</a>
+    {% endif %}
 {% endblock %}
