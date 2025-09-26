@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Список оголошень{% endblock %}
+{% block content %}
+
+<h1> Список оголошень </h1>
+
+{% if announcement_list %}
+    {% for announcement in announcement_list %}
+        <h3>{{announcement.title}}</h3>
+        <h2> {{announcement.text}} </h2>
+        <h1> {{announcement.create_time}} </h1>
+    {% endfor %}
+{% else %}
+    <h2> Немає оголошень! </h2>
+{% endif %}
+
+{% endblock %}

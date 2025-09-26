@@ -1,3 +1,8 @@
+from django.views import View
 from django.shortcuts import render
+from .models import Announcement
 
-# Create your views here.
+class AnnouncementListView(View):
+    def get(self, request):
+        announcement = Announcement.objects.all()
+        return render(request, "announcements/announcement_list.html", {'announcement_list': announcement})
