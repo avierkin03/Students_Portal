@@ -8,7 +8,7 @@ class Announcement(models.Model):
     creator = models.creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="articles")
 
     class Meta():
-        ordering = ["-created_at"]
+        ordering = ["-create_time"]
 
     def __str__(self):
         return f"{self.title} creator: {self.creator}"
