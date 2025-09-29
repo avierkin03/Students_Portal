@@ -1,5 +1,42 @@
 {% extends 'base.html' %}
 {% block title %}Опитування{% endblock %}
 {% block content %}
+<h1>{{ poll.title }}</h1>
+{% if poll.description %}
+    <p>{{ poll.description|linebreaks }}</p>
+{% endif %}
+<p>Створено: {{ poll.created_at|date:"d.m.Y H:i" }} | Автор: {{ poll.created_by.username }}</p>
 
+{% if user.is_authenticated %}
+    {% if has_voted %}
+        <div>
+            Ви вже проголосували в цьому опитуванні.
+        </div>
+        <h5>Результати:</h5>
+        <ul>
+            {% for option in poll.options.all %}
+                <li>{{ option.text }}: {{ option.vote_count }} голосів</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h5>Проголосувати:</h5>
+        <form method="post" action="{% url 'polls:poll_vote' poll.pk %}">
+            {% csrf_token %}
+            {% for option in poll.options.all %}
+                <div>
+                    <input type="radio" name="option" id="option{{ option.id }}" value="{{ option.id }}" required>
+                    <label for="option{{ option.id }}">
+                        {{ option.text }}
+                    </label>
+                </div>
+            {% endfor %}
+            <button type="submit">Проголосувати</button>
+        </form>
+    {% endif %}
+{% else %}
+    <div>
+        <p>Будь ласка, <a href="{% url 'login' %}">увійдіть</a>, щоб проголосувати.</p>
+    </div>
+{% endif %}
+<a href="{% url 'polls:poll_list' %}">Назад до списку</a>
 {% endblock %}

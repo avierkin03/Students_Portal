@@ -8,4 +8,6 @@ urlpatterns = [
     path('', views.PollListView.as_view(), name='poll_list'),
     # Деталі опитування
     path('<int:pk>/', views.PollDetailView.as_view(), name='poll_detail'),
+    # Обробка голосування в опитуванні
+    path('<int:pk>/vote/', views.PollVoteView.as_view(), name='poll_vote'),
 ]
