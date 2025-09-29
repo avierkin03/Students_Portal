@@ -15,7 +15,5 @@
     {% else %}
         <p class="alert alert-info">Наразі немає активних опитувань.</p>
     {% endif %}
-    {% if user.is_authenticated and user.profile.role in 'admin,moderator' %}
-        <a href="#" class="btn btn-primary">Створити опитування</a>
-    {% endif %}
+    <a href="{% url 'polls:poll_create' %}">Створити опитування</a>
 {% endblock %}
