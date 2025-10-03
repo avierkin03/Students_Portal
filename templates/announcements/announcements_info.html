@@ -2,4 +2,9 @@
 {% block title %}Оголошення{% endblock %}
 {% block content %}
 
+<h1>{{ announcement.title }}</h1>
+<p>{{ announcement.text }}</p>
+<p><small>Створено: {{ announcement.create_time }}</small></p>
+<a href="{% url 'announcements:announcement_list' %}"> Назад до списку</a>
+
 {% endblock %}
