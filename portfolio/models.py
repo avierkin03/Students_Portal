@@ -2,17 +2,19 @@ from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 import uuid
 
 
 class Portfolio(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='portfolios')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='portfolios')
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
     short_bio = models.CharField(max_length=500, blank=True)
 
     # проєкти: список словників (див. схему в docstring)
     projects = models.JSONField(default=list, blank=True)
+    cover_image = models.ImageField(default=True, upload_to="portdolio_img")
 
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
