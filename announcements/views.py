@@ -1,4 +1,4 @@
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy
 from django.shortcuts import render, get_object_or_404
@@ -24,4 +24,10 @@ class AnnouncementCreateView(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+    
+
+class AnnouncementDeleteView(DeleteView):
+    model = Announcement
+    template_name = "announcements/announcement_confirm_delete.html"
+    success_url = reverse_lazy("announcements:announcement_list")
 
