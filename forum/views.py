@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from forum import models 
 from forum.form import TopicForm, PostForm
-from forum.mixings import UserPassesTestMixin
+from forum.mixings import UserPassesTestMixin, LoginRequiredMixin
 # Create your views here.
 
 class ClassForumList(ListView):
@@ -19,18 +19,18 @@ class ClassForumDetail(DetailView, UserPassesTestMixin):
 
 
 
-class TopicCreateView(CreateView):
+class TopicCreateView(LoginRequiredMixin, CreateView):
     model = models.Topic
     form_class = TopicForm
     template_name = "forum/forum_create.html"
 
 
-class TopicDeleteView(DeleteView):
+class TopicDeleteView(LoginRequiredMixin, DeleteView):
     model = models.Topic
     template_name = "forum/forum_delete.html"
 
 
-class TopicUpdateView(UpdateView):
+class TopicUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Topic
     template_name = "forum/forum_update.html"
 
@@ -40,7 +40,7 @@ class PostCreateView(CreateView):
     form_class = PostForm
     template_name = "forum/post_create.html"
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin, DeleteView ):
     model = models.Post
     template_name = "forum/post_delete.html"
 

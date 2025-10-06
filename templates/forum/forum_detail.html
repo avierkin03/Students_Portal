@@ -2,4 +2,10 @@
 {% block title %}Підтвердити видалення повідомлення{% endblock %}
 {% block content %}
 
+<h2>{{ forum.name}}</h2>
+
+
+<form method="post">
+    {% csrf_token %}
+</form>
 {% endblock %}

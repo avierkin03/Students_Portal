@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}Форум{% endblock %}
 {% block content %}
+
+
+
+<p>
+    {{ forum.name}}
+    <form method="post" action="{% url 'forum_update' forum_id%}">
+        {% csrf_token %}
+        <button type="submit"> Змінити </button>
+    </form>
+</p>
 
 {% endblock %}
