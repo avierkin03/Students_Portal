@@ -48,7 +48,7 @@ def logout_user(request):
 @login_required
 def user_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'profiles/user_profile.html', {'profile': profile})
+    return render(request, 'user_profile.html', {'profile': profile})
 
 # Функція редагування профілю користувача
 @login_required
