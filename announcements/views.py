@@ -19,7 +19,7 @@ class AnnouncementInfoView(View):
 class AnnouncementCreateView(CreateView):
     model = Announcement
     template_name = "announcements/announcement_create.html"
-    fields = ["title", "text"]
+    fields = ["title", "text", "poster"]
     success_url = reverse_lazy("announcements:announcement_list")
     def form_valid(self, form):
         form.instance.user = self.request.user
