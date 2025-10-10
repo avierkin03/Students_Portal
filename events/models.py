@@ -1,15 +1,35 @@
+import uuid
 from django.db import models
 
 from django.db import models
 
 # Create your models here.
 class Events(models.Model):
+    CATEGORY_CHOICES = [
+        ('MEETING', 'Зустріч'),
+        ('WORKSHOP', 'Воркшоп'),
+        ('SEMINAR', 'Семінар'),
+        ('CONFERENCE', 'Конференція'),
+        ('SOCIAL', 'Соціальна подія'),
+        ('VACATION', 'Відпочинок'),
+        ('OTHER', 'Інше'),
+    ]
+    TYPE_CHOICES = [
+        ('ONLINE', 'Онлайн'),
+        ('OFFLINE', 'Офлайн'),
+        ('HYBRID', 'Гібридний'),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+
     title = models.CharField(max_length=200)
     description = models.TextField()
-    category = models.ForeignKey('EventCategory', on_delete=models.SET_NULL, null = True, blank=True, related_name='events')
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, default='OTHER')
     location = models.CharField(max_length=200, blank=True, null=True)
     date = models.DateTimeField()
+    due_date = models.DateTimeField(blank=True, null=True)
     capacity = models.PositiveIntegerField(blank=True, null=True)
+    people_registered = models.PositiveIntegerField(default=0)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='OFFLINE')
 
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='events')
@@ -18,13 +38,6 @@ class Events(models.Model):
 
     def __str__(self):
         return self.title
-    
-class EventCategory(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
     
 # class EventCalendar(models.Model):
 #     CALENDAR_TYPES = [
