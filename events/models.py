@@ -86,5 +86,9 @@ class EventRegistration(models.Model):
     is_confirmed = models.BooleanField(default=False)
     confirmation_token = models.CharField(max_length=100, blank=True, null=True)
 
+    def generate_token(self):
+        self.confirmation_token = uuid.uuid4().hex
+        self.save()
+
     def __str__(self):
         return f'{self.user} registration for {self.event}'

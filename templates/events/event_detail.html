@@ -28,12 +28,26 @@
                     </div>
                 {% elif user.is_staff or user.is_superuser %}
                     <div class="mb-2">
-                        <a href="{% url 'events:event-delete' pk=event.pk %}" class="btn btn-outline-danger btn-sm">
-                            🗑️ Видалити
+                        <a href="{% url 'events:event-delete' pk=event.pk %}">
+                            Видалити
                         </a>
                     </div>
                 {% endif %}
-                <a href="#" >Зареєструватися</a>
+                {% if user != event.created_by %}
+                    {% if user_registered %}
+                        <p class="text-green-700 font-semibold">✅ Ви підтвердили участь у події</p>
+                    {% elif user_pending %}
+                        <p class="text-yellow-700 font-semibold">📧 Перевірте пошту для підтвердження</p>
+                    {% else %}
+                        <form method="post" action="{% url 'events:event-register' pk=event.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Зареєструватися</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Ви є автором цієї події</p>
+                {% endif %}
+
             {% else %}
                 <a href="{% url 'login' %}?next={{ request.path }}">
                     Увійти, щоб зареєструватися
@@ -45,7 +59,7 @@
             <div>
                 <h6 class="fw-semibold mb-2">Організатор</h6>
                 <p class="mb-0">
-                    👤 {{ event.created_by.username }}
+                    {{ event.created_by.username }}
                 </p>
                 <small class="text-muted">
                     Додано {{ event.created_at|date:"d M Y" }}

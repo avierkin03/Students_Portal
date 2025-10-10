@@ -1,6 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .models import Events, EventComment
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.conf import settings
+from django.core.mail import send_mail
+from .models import Events, EventComment, EventRegistration
 from .forms import EventForm, CommentForm
 from .mixins import UserIsOwnerMixin
 
@@ -35,6 +39,12 @@ class EventDetailView(DetailView):
         context["comments"] = self.object.comments.all().order_by("-created_at")
         # context["comments"] = self.object.comments.select_related("author")
         context["form"] = CommentForm()
+        context["user_registered"] = self.object.registrations.filter(
+            user=self.request.user, is_confirmed=True
+        ).exists()
+        context["user_pending"] = self.object.registrations.filter(
+            user=self.request.user, is_confirmed=False
+        ).exists()
         return context
     
     def post(self, request, *args, **kwargs):
@@ -81,3 +91,52 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         event = self.get_object()
         return self.request.user == event.created_by or self.request.user.is_staff
+
+@login_required
+def register_for_event(request, pk):
+    event = get_object_or_404(Events, pk=pk)
+    user = request.user
+
+    if EventRegistration.objects.filter(user=user, event=event).exists():
+        messages.info(request, "Ви вже зареєстровані на цю подію.")
+        return redirect("events:event-detail", pk=pk)
+
+    if event.capacity and event.people_registered >= event.capacity:
+        messages.error(request, "На жаль, усі місця вже зайняті.")
+        return redirect("events:event-detail", pk=pk)
+
+    if user.email:
+        registration = EventRegistration.objects.create(user=user, event=event)
+        registration.generate_token()
+
+        confirm_url = request.build_absolute_uri(
+            f"/events/confirm-registration/{registration.confirmation_token}/"
+        )
+
+        send_mail(
+            subject=f"Підтвердження реєстрації на {event.title}",
+            message=f"Вітаємо, {user.username}! Щоб підтвердити участь, перейдіть за посиланням: {confirm_url}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        messages.success(request, "Ми надіслали лист із підтвердженням на вашу електронну пошту.")
+    else:
+        messages.warning(request, "Ви зареєстровані, але у вас не вказаний email. Не забудьте додати його у профілі, щоб підтвердити участь.")
+
+    return redirect("events:event-detail", pk=pk)
+
+def confirm_registration(request, token):
+    registration = get_object_or_404(EventRegistration, confirmation_token = token)
+
+    if registration.is_confirmed:
+        messages.info(request, 'Ви вже підтвердили участь.')
+    else:
+        registration.is_confirmed = True
+        registration.save(update_fields=["is_confirmed"])
+        registration.event.people_registered +=1 
+        registration.event.save(update_fields=["people_registered"])
+        messages.success(request, f"Участь у події {registration.event.title} підтверджено!")
+
+    return redirect("events:event-detail", pk=registration.event.pk)
+

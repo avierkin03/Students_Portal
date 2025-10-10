@@ -2,14 +2,14 @@
 {% block content %}
 <div class="event-form-card">
     <h1 class="form-title">
-        {% if form.instance.pk %}Редагувати подію{% else %}Створити подію{% endif %}
+        Створити подію
     </h1>
 
     <form method="post" class="task-form">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="submit-btn">
-            {% if form.instance.pk %}Зберегти{% else %}Створити{% endif %} подію
+            Створити подію
         </button>
     </form>
 
