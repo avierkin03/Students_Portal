@@ -3,9 +3,9 @@
 {% block content %}
 
 
+<p>ВИдалення теми {{topic_delete.name}}</p>
 
-
-<form method="post" action="{% url 'forum_delete' forum.id %}">
+<form method="post" action="">
     {% csrf_token %}
     <button type="submit">Видалити</button>
 </form>

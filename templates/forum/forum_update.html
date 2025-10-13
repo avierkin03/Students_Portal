@@ -3,12 +3,12 @@
 
 
 
-<p>
-    {{ forum.name}}
-    <form method="post" action="{% url 'forum_update' forum_id%}">
-        {% csrf_token %}
-        <button type="submit"> Змінити </button>
-    </form>
-</p>
+
+{{ topic.name}}
+<form method="post" action="{% url 'forum_update' topic.pk%}">
+    {% csrf_token %}
+    <button type="submit"> Змінити </button>
+</form>
+
 
 {% endblock %}
