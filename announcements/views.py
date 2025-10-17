@@ -25,6 +25,9 @@ class AnnouncementCreateView(CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
+#class AnnouncementAddPicture(CreateView):
+
+    
 
 class AnnouncementDeleteView(DeleteView):
     model = Announcement
