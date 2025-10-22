@@ -1,4 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<div>
+    <h2>Видалити подію</h2>
+    <p>Ви впевнені що хочете видалити подію "{{ object.title }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Підтвердити</button>
+        <a href="{% url 'events:event-list' %}">Скасувати</a>
+    </form>
+</div>
 {% endblock %}

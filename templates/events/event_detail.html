@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <a href="{% url 'events:event-list' %}">← Назад до списку</a>
+        <div>
+            <div>
+                <h2 class="fw-bold mb-1">{{ event.title }}</h2>
+                <div class="text-muted mb-2">
+                    {{ event.get_category_display }} • {{ event.get_type_display }}
+                </div>
+                <div class="text-secondary small">
+                    {{ event.date|date:"d M Y, H:i" }}
+                    {% if event.due_date %}
+                        — {{ event.due_date|date:"d M Y, H:i" }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+                {% if user == event.created_by %}
+                    <div class="mb-2">
+                        <a href="{% url 'events:event-update' pk=event.pk %}">
+                            Редагувати
+                        </a>
+                        <a href="{% url 'events:event-delete' pk=event.pk %}">
+                            Видалити
+                        </a>
+                    </div>
+                {% elif user.is_staff or user.is_superuser %}
+                    <div class="mb-2">
+                        <a href="{% url 'events:event-delete' pk=event.pk %}">
+                            Видалити
+                        </a>
+                    </div>
+                {% endif %}
+                {% if user != event.created_by %}
+                    {% if user_registered %}
+                        <p class="text-green-700 font-semibold">✅ Ви підтвердили участь у події</p>
+                    {% elif user_pending %}
+                        <p class="text-yellow-700 font-semibold">📧 Перевірте пошту для підтвердження</p>
+                    {% else %}
+                        <form method="post" action="{% url 'events:event-register' pk=event.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Зареєструватися</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Ви є автором цієї події</p>
+                {% endif %}
+
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}">
+                    Увійти, щоб зареєструватися
+                </a>
+            {% endif %}
+        </div>
+    
+        <div>
+            <div>
+                <h6 class="fw-semibold mb-2">Організатор</h6>
+                <p class="mb-0">
+                    {{ event.created_by.username }}
+                </p>
+                <small class="text-muted">
+                    Додано {{ event.created_at|date:"d M Y" }}
+                </small>
+            </div>
+
+            <div>
+                <h6 class="fw-semibold mb-2">Учасники</h6>
+                <p>{{ event.people_registered }} / {{ event.capacity|default:"∞" }}</p>
+            </div>
+        </div>
+
+    <div class="row">
+        <div>
+            <div>
+                <h5 class="fw-semibold mb-3">Опис події</h5>
+                <p>{{ event.description|linebreaks }}</p>
+
+                {% if event.event_link %}
+                    <p class="mt-3">
+                        🔗 <a href="{{ event.event_link }}" target="_blank">Посилання на подію</a>
+                    </p>
+                {% endif %}
+                {% if event.location %}
+                    <p>📍 <strong>Локація:</strong> {{ event.location }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <h5 class="fw-semibold mb-4">Коментарі</h5>
+
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="border-bottom mb-3 pb-2">
+                            <strong>{{ comment.author.username }}</strong>
+                            <span class="text-muted small">
+                                {{ comment.created_at|date:"d M Y, H:i" }}
+                            </span>
+                            <p class="mt-1">{{ comment.content }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Ще немає коментарів. Будьте першим!</p>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <form method="post" class="mt-3">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit">Додати коментар</button>
+                    </form>
+                {% else %}
+                    <p class="text-muted mt-2">
+                        <a href="{% url 'login' %}?next={{ request.path }}">Увійдіть</a>, щоб залишити коментар.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
