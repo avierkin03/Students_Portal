@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+{% if posts %}
+    {% for post in posts %}
+        <p>{{ post.topic }} - {{ post.owner_post }}</p>
+    {% endfor %}
+{% else %}
+    <p>немає постів</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Створити</button>
+</form>
+{% endblock %}

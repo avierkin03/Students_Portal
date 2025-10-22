@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}Форум{% endblock %}
 {% block content %}
 
+<a href="{% url 'forum:forum_create'%}">Create a new topic</a>
+<br>
+<a href="{% url 'forum:post_create'%}">Create a new post</a>
+<h2> {{post.name}} </h2>
+<p> {{post.title}} </p>
+{% for forum in topics %}
+    <p>        
+        <a href="{% url 'forum:forum_detail' forum.pk%}">{{ forum.title}}</a>
+        <form method="post" action="{% url 'forum:forum_delete' forum.pk%}">
+            
+            {% csrf_token %}
+            <button type="submit"> Видалити </button>
+        </form>
+    </p>
+{% endfor %}
 {% endblock %}
