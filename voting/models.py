@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 class Voting(models.Model):
     title = models.CharField(max_length=200, verbose_name="Назва голосування")
@@ -7,7 +7,7 @@ class Voting(models.Model):
     start_date = models.DateTimeField(verbose_name="Початок голосування")
     end_date = models.DateTimeField(verbose_name="Кінець голосування")
     is_active = models.BooleanField(default=True, verbose_name="Активне")
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_votings")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="created_votings")
 
     def __str__(self):
         return self.title
@@ -23,7 +23,7 @@ class Option(models.Model):
         return self.text
 
 class Vote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="votes")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="votes")
     voting = models.ForeignKey(Voting, on_delete=models.CASCADE, related_name="votes")
     option = models.ForeignKey(Option, on_delete=models.CASCADE, related_name="votes")
     voted_at = models.DateTimeField(auto_now=True)

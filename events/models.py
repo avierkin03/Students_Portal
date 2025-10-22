@@ -1,7 +1,6 @@
 import uuid
 from django.db import models
-
-from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class Events(models.Model):
@@ -32,7 +31,7 @@ class Events(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='OFFLINE')
 
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='events')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='events')
 
     event_link = models.URLField(blank=True, null=True)
 
@@ -71,7 +70,7 @@ class Events(models.Model):
     
 class EventComment(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='event_comments')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='event_comments')
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -79,7 +78,7 @@ class EventComment(models.Model):
         return f'Comment by {self.author} on {self.event}'
     
 class EventRegistration(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='event_registrations')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='event_registrations')
     event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='registrations')
     registered_at = models.DateTimeField(auto_now_add=True)
 

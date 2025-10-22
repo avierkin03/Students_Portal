@@ -17,6 +17,12 @@ class ClassForumDetail(DetailView, UserPassesTestMixin):
     context_object_name = "topic"
     template_name = "forum/forum_detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Додаємо форму для створення повідомлення
+        context['form'] = PostForm()
+        context['posts'] = self.object.posts.all()
+        return context
 
 
 
@@ -46,6 +52,15 @@ class PostCreateView(CreateView):
     form_class = PostForm
     template_name = "forum/post_create.html"
     success_url = reverse_lazy('forum:forum_list')
+
+    def form_valid(self, form):
+        form.instance.topic = models.Topic.objects.get(pk=self.kwargs['pk'])
+        form.instance.owner_post = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('forum:forum_detail', kwargs={'pk': self.kwargs['pk']})
+    
 
 class PostDeleteView(LoginRequiredMixin, DeleteView ):
     model = models.Post

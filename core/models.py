@@ -1,11 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import User
-
-
 
 class Log_User(AbstractUser):
-    # Авторизація та Реєстрація(та перевірка на ролі)
     class Roles(models.TextChoices):
         USER = "user", "Користувач"
         MODERATOR = "moderator", "Модератор"
@@ -18,15 +14,29 @@ class Log_User(AbstractUser):
         verbose_name="Роль"
     )
 
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='log_user_groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_query_name='log_user'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='log_user_permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_query_name='log_user'
+    )
+
     def is_moderator(self):
         return self.role == self.Roles.MODERATOR
 
     def is_admin(self):
         return self.role == self.Roles.ADMIN or self.is_superuser
-    
+
 class UserProfile(models.Model):
-    # Особистий кабінет користувача
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField('core.Log_User', on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True, null=True, verbose_name="Біографія")
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -35,18 +45,14 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Профіль {self.user.username}"
 
-
 class Group(models.Model):
-    # Група користувачів (наприклад, навчальна група, команда тощо)
     name = models.CharField(max_length=100, unique=True)
-    members = models.ManyToManyField(User, related_name="groups")
+    members = models.ManyToManyField('core.Log_User', related_name="custom_groups")
 
     def __str__(self):
         return self.name
 
-
 class GroupProfile(models.Model):
-    # Особистий кабінет групи
     group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name="profile")
     description = models.TextField(blank=True, null=True)
     logo = models.ImageField(upload_to="group_logos/", blank=True, null=True)
