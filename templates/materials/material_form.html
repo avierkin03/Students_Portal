@@ -1,4 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-    
+<div class="container">
+    <a href="{% url 'materials:material_create' %}"></a>
+    <h1>{% if material %}Редактировать{% else %}Добавить{% endif %} материал</h1>
+
+
+    <form method="post">
+        {% csrf_token %}
+
+        <p>
+            <label for="title">Название:</label>
+            <input type="text" name="title" id="title" value="{{ material.title }}" required>
+        </p>
+        
+        <p>
+        <label for="description">Описание:</label>
+        <textarea name="description" id="description" rows="5" required>{{ material.description }}</textarea>
+        </p>
+
+        <p>
+        <label for="resource">Посилання:</label>
+        <input type="text" name="resource" id="resource" value="{{ material.resource }}" required>
+        </p>
+
+        <p>
+        <label for="category">Категория:</label>
+        <select name="category" id="category" required>
+            {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if material and material.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        </p>
+
+        <p>
+        <button type="submit">{% if material %}Сохранить{% else %}Добавить{% endif %}</button>
+        </p>
+    </form>
+</div>   
 {% endblock %}
