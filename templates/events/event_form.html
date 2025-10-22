@@ -1,4 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-  
+<div class="event-form-card">
+    <h1 class="form-title">
+        Створити подію
+    </h1>
+
+    <form method="post" class="task-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">
+            Створити подію
+        </button>
+    </form>
+
+    <div class="back-link">
+        <a href="{% url 'events:event-list' %}">← Назад до списку</a>
+    </div>
+</div>
 {% endblock %}
