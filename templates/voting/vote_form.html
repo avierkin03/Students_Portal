@@ -1,5 +1,397 @@
 {% extends 'base.html' %}
-{% block title %}Голосування{% endblock %}
+
+{% block title %}
+    {% if form.instance.pk %}Редагувати голосування{% else %}Створити голосування{% endif %}
+{% endblock %}
+
 {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'voting:voting_list' %}">Голосування</a></li>
+                <li class="breadcrumb-item active">
+                    {% if form.instance.pk %}Редагувати{% else %}Створити{% endif %}
+                </li>
+            </ol>
+        </nav>
+
+        <div class="card voting-card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h4 mb-0">
+                    <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Редагувати голосування{% else %}Створити нове голосування{% endif %}
+                </h2>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="votingForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <label class="form-label">Назва голосування</label>
+                        <input type="text" class="form-input" value="121313вфв">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Опис</label>
+                        <input type="text" class="form-input" placeholder="_______">
+                    </div>
+
+                    <!-- Дати початку та завершення -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label">Початок голосування</label>
+                                {{ form.start_date }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">Кінець голосування</label>
+                                {{ form.end_date }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label for="{{ form.is_active.id_for_label }}" class="form-check-label">Активне голосування</label>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="h6 mb-3">Варіанти відповідей:</h5>
+                    
+                    <div id="options-container">
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            <div class="option-item card mb-3" data-form-index="{{ forloop.counter0 }}">
+                                <div class="card-body py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-10">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-primary me-3">{{ forloop.counter }}</span>
+                                                <div class="flex-grow-1">
+                                                    {{ form.text }}
+                                                    {{ form.id }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 text-end">
+                                            {% if formset.can_delete %}
+                                                <div class="d-none">
+                                                    {{ form.DELETE }}
+                                                </div>
+                                                <button type="button" class="btn btn-danger btn-sm delete-option" title="Видалити варіант">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="button" id="add-option" class="btn btn-outline-primary mb-4">
+                        <i class="fas fa-plus me-2"></i>Додати варіант
+                    </button>
+
+                    <hr class="my-4">
+
+                    <!-- Кнопки дій -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'voting:voting_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Скасувати
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            {% if form.instance.pk %}Зберегти{% else %}Створити{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.voting-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background: #2c5aa0 !important;
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.card-header h2 {
+    color: white;
+    font-weight: 600;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.form-control:focus {
+    border-color: #2c5aa0;
+    box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.15);
+    background: #fff;
+}
+
+/* Поля дат - чорно-білі */
+input[type="datetime-local"] {
+    background: #fff;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #495057;
+}
+
+input[type="datetime-local"]:focus {
+    border-color: #2c5aa0;
+    box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.15);
+    background: #fff;
+}
+
+.form-check-input {
+    width: 2.5em;
+    height: 1.25em;
+}
+
+.form-check-input:checked {
+    background-color: #2c5aa0;
+    border-color: #2c5aa0;
+}
+
+.option-item {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.option-item:hover {
+    border-color: #ced4da;
+}
+
+.badge {
+    background: #2c5aa0;
+    color: white;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: #2c5aa0;
+    border-color: #2c5aa0;
+    color: white;
+}
+.edit-voting-form {
+    max-width: 600px;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.edit-voting-form h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.form-label {
+    min-width: 150px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox {
+    margin: 0;
+}
+.btn-primary:hover {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    border-color: #bd2130;
+}
+
+.btn-outline-primary {
+    border-color: #2c5aa0;
+    color: #2c5aa0;
+}
+
+.btn-outline-primary:hover {
+    background: #2c5aa0;
+    color: white;
+}
+
+.form-label {
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #e9ecef;
+    margin: 1.5rem 0;
+}
+
+.breadcrumb {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 10px 15px;
+}
+
+.breadcrumb-item a {
+    color: #495057;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const optionsContainer = document.getElementById('options-container');
+    const addButton = document.getElementById('add-option');
+    const totalForms = document.getElementById('id_options-TOTAL_FORMS');
+    let formCount = parseInt(totalForms.value);
     
+    // Функція для оновлення номерів варіантів
+    function updateOptionNumbers() {
+        const optionItems = optionsContainer.querySelectorAll('.option-item');
+        optionItems.forEach((item, index) => {
+            const badge = item.querySelector('.badge');
+            badge.textContent = index + 1;
+        });
+    }
+    
+    // Додавання нового варіанту
+    addButton.addEventListener('click', function() {
+        const lastOption = optionsContainer.querySelector('.option-item:last-child');
+        const newOption = lastOption.cloneNode(true);
+        
+        formCount++;
+        
+        // Оновлюємо імена полів
+        const inputs = newOption.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.name.includes('text')) {
+                input.name = input.name.replace(/-\d+-/, `-${formCount}-`);
+                input.value = '';
+            } else if (input.name.includes('DELETE')) {
+                input.name = input.name.replace(/-\d+-/, `-${formCount}-`);
+                input.checked = false;
+            } else if (input.name.includes('id')) {
+                input.name = input.name.replace(/-\d+-/, `-${formCount}-`);
+                input.value = '';
+            }
+            input.id = input.id.replace(/-\d+-/, `-${formCount}-`);
+        });
+        
+        // Оновлюємо data-атрибут
+        newOption.setAttribute('data-form-index', formCount);
+        
+        // Додаємо новий варіант
+        optionsContainer.appendChild(newOption);
+        totalForms.value = formCount;
+        updateOptionNumbers();
+    });
+    
+    // Видалення варіанту при натисканні на червоний хрестик
+    optionsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-option') || 
+            e.target.closest('.delete-option')) {
+            const deleteBtn = e.target.classList.contains('delete-option') ? 
+                e.target : e.target.closest('.delete-option');
+            const optionItem = deleteBtn.closest('.option-item');
+            
+            // Перевіряємо, щоб залишився хоча б один варіант
+            if (optionsContainer.querySelectorAll('.option-item').length > 1) {
+                // Знаходимо checkbox DELETE та позначаємо його
+                const deleteCheckbox = optionItem.querySelector('input[name$="-DELETE"]');
+                if (deleteCheckbox) {
+                    deleteCheckbox.checked = true;
+                }
+                
+                // Ховаємо варіант
+                optionItem.style.display = 'none';
+            } else {
+                alert('Повинен залишитися хоча б один варіант відповіді');
+            }
+        }
+    });
+    
+    // Ініціалізація номерів варіантів
+    updateOptionNumbers();
+});
+</script>
 {% endblock %}
