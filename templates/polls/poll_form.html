@@ -1,5 +1,38 @@
 {% extends 'base.html' %}
 {% block title %}Опитування{% endblock %}
 {% block content %}
+    <h1>{% if form.instance.pk %}Редагувати опитування{% else %}Створити опитування{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            <label for="{{ form.title.id_for_label }}">Назва</label>
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+        <div>
+            <label for="{{ form.description.id_for_label }}">Опис</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+        <div>
+            {{ form.is_active }}
+            <label for="{{ form.is_active.id_for_label }}">Активне</label>
+            {{ form.is_active.errors }}
+        </div>
 
+        <h5>Варіанти відповідей</h5>
+        {{ formset.management_form }}
+        {{ formset.non_form_errors }}
+        {% for form in formset %}
+            <div>
+                <label>Варіант {{ forloop.counter }}</label>
+                {{ form.text }}
+                {{ form.text.errors }}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Зберегти</button>
+        <a href="{% url 'polls:poll_list' %}">Скасувати</a>
+    </form>
 {% endblock %}
