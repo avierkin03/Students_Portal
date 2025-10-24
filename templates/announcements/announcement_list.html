@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load dictionary_tags %}
+{% block title %}Список оголошень{% endblock %}
+{% block content %}
+
+<h1>Список оголошень</h1>
+
+<a href="{% url 'announcements:announcement_create' %}">➕ Додати оголошення</a>
+
+{% if announcement_list %}
+    {% for announcement in announcement_list %}
+        <a href="{% url 'announcements:announcement_detail' announcement.pk %}">
+            <div style="width:110px; height:110px; overflow:hidden; border:1px solid #555; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+              <img
+                src="{{ announcement.poster.url }}"
+                alt="{{ announcement.title }}"
+                style="width:100%; height:100%; object-fit:cover; display:block;"
+              >
+            </div>
+            <h3>{{ announcement.title }}</h3>
+            <p><small>{{ announcement.create_time }}</small></p>
+        </a>
+        <div class="emoji-reactions">
+            {% for emoji, label in emoji_choices.items %}
+                <span>
+                    <a href="{% url 'announcements:add_reaction' announcement.pk emoji %}" class="{% if request.user.is_authenticated and user_reactions|lookup:announcement.pk == emoji %}selected{% endif %}">
+                        {{ emoji }} {{ emoji_counts|lookup:announcement.pk|lookup:emoji }}
+                    </a>
+                </span>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% else %}
+    <h2>Немає оголошень!</h2>
+{% endif %}
+
+{% endblock %}

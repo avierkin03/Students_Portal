@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from core.models import UserProfile, Group, GroupProfile
+from core.models import Log_User, UserProfile, Group, GroupProfile
 from django.contrib.auth.decorators import login_required
 from django.views.generic import DetailView, UpdateView, CreateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -47,8 +47,8 @@ def logout_user(request):
 # Функція перегляд особистого профілю користувача
 @login_required
 def user_profile(request):
-    profile = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'core/users_profile/user_profile.html', {'profile': profile})
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    return render(request, 'core/user_profile.html', {'profile': profile})
 
 # Функція редагування профілю користувача
 @login_required

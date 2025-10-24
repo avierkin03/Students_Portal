@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-p@=6k8u*hypsn+u^^#fy%(or$&-h+8b8xq)q&3!v$y#!jt2-id
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 # Application definition
 
@@ -133,3 +134,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'static/media'
+
+AUTH_USER_MODEL = "core.Log_User"
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@theaterbooking.com"

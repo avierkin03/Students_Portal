@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <h1 class="form-title">Редагувати подію</h1>
+
+    <form method="post" class="task-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">Зберегти</button>
+    </form>
+
+    <div class="back-link">
+        <a href="{% url 'events:event-detail' pk=object.pk %}">← Назад до завдання</a>
+    </div>
+</div>
+{% endblock %}

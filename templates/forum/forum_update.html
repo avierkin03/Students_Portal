@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+
+{{ topic.name}}
+<form method="post" action="{% url 'forum_update' topic.pk%}">
+    {% csrf_token %}
+    <button type="submit"> Змінити </button>
+</form>
+
+
+{% endblock %}

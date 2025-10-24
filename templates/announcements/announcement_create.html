@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Нове оголошення{% endblock %}
+{% block content %}
+<h1>Створити нове оголошення</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Зберегти</button>
+</form>
+
+<a href="{% url 'announcements:announcement_list' %}">⬅ Назад до списку</a>
+{% endblock %}
