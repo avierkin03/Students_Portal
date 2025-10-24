@@ -6,19 +6,29 @@
 
 <a href="{% url 'announcements:announcement_create' %}">➕ Додати оголошення</a>
 
+<h1>-------------------------------------</h1>
 {% if announcement_list %}
     {% for announcement in announcement_list %}
-        <a href="{% url 'announcements:announcement_detail' announcement.pk %}">
+        <a href="{% url 'announcements:announcements_router' announcement.pk %}">
             <div style="width:110px; height:110px; overflow:hidden; border:1px solid #555; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.3);">
               <img
                 src="{{ announcement.poster.url }}"
                 alt="{{ announcement.title }}"
-                style="width:100%; height:100%; object-fit:cover; display:block;"
+                style="width:110px; height:110px; object-fit:cover; display:block;"
               >
             </div>
             <h3>{{announcement.title}}</h3>
-            <h1> {{announcement.create_time}} </h1>
+            <h5> {{announcement.create_time}} </h5>
         </a>
+        {% if announcement.reactions %}
+          {% for reaction in announcement.reactions.all %}
+          <div style="width:30px; height:30px; border:1px solid #555; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.3); overflow:hidden;">
+              <img src="{{ reaction.reaction.url }}" alt=""
+                   style="width:30px; height:30px; object-fit:contain; display:block;">
+          </div>
+          {% endfor %}
+        {% endif %}
+        <h1>-------------------------------------</h1>
     {% endfor %}
 {% else %}
     <h2> Немає оголошень! </h2>
