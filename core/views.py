@@ -18,10 +18,10 @@ def logins_user(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, 'Вхід виконано успішно!')
-            return redirect('home')
+            return redirect('core:group_profile')
     else:
         form = User_Login_Form()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'core/user/login.html', {'form': form})
 
 # Функція реєстрації
 def register_user(request):
@@ -31,59 +31,60 @@ def register_user(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Реєстрація успішна!')
-            return redirect('home')
+            return redirect('core:group_profile')
     else:
         form = User_Register_Form()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'core/user/register.html', {'form': form})
 
 # Функція вихода
 def logout_user(request):
     logout(request)
     messages.info(request, 'Ви вийшли із системи.')
-    return redirect('home')
+    return redirect('core:group_profile')
 
 
 # ------------------ КОРИСТУВАЧ ------------------
 # Функція перегляд особистого профілю користувача
 @login_required
 def user_profile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'user_profile.html', {'profile': profile})
+    profile = UserProfile.objects.get_or_create(user=request.user)
+    return render(request, 'core/users_profile/user_profile.html', {'profile': profile})
 
 # Функція редагування профілю користувача
 @login_required
-def edit_user_profile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+def user_profile_forms(request):
+    profile = UserProfile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        form = User_Profile_Form(request.POST, request.FILES, instance=profile)
+        form = User_Profile_Form(request.POST, request.FILES)
         if form.is_valid():
+            form.instance.user = request.user
             form.save()
-            return redirect('user_profile')
+            return redirect('core:user_profile')
     else:
-        form = User_Profile_Form(instance=profile)
+        form = User_Profile_Form()
 
-    return render(request, 'edit_user_profile.html', {'form': form})
+    return render(request, 'core/users_profile/user_profile_form.html', {'form': form})
 
 
 # ------------------ ГРУПИ ------------------
 # Список усіх груп
 class GroupList(LoginRequiredMixin, ListView):
     model = Group
-    template_name = 'group_list.html'
+    template_name = 'core/group/group_list.html'
     context_object_name = 'groups'
 
 # Деталі групи
 class GroupDetail(LoginRequiredMixin, DetailView):
     model = Group
-    template_name = 'group_detail.html'
+    template_name = 'core/group/group_detail.html'
     context_object_name = 'group'
 
 # Створення нової групи
 class GroupCreate(LoginRequiredMixin, CreateView):
     model = Group
     form_class = Group_Form
-    template_name = 'group_form.html'
+    template_name = 'core/group/group_form.html'
     success_url = reverse_lazy('group_list')
 
     def form_valid(self, form):
@@ -96,18 +97,20 @@ class GroupCreate(LoginRequiredMixin, CreateView):
 # Перегляд профілю групи
 class GroupProfileDetail(LoginRequiredMixin, DetailView):
     model = GroupProfile
-    template_name = 'group_profile.html'
+    template_name = 'core/group/group_profile.html'
     context_object_name = 'profile'
+    def get_object(self):
+        return GroupProfile.objects.first()
 
 # Редагування профілю групи
 class GroupProfileUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = GroupProfile
     form_class = Group_Profile_Form
-    template_name = 'group_profile_form.html'
+    template_name = 'core/group/group_profile_form.html'
 
     def test_func(self):
         group_profile = self.get_object()
         return self.request.user in group_profile.group.members.all()
 
     def get_success_url(self):
-        return reverse_lazy('group_profile', kwargs={'pk': self.object.pk})
+        return reverse_lazy('group_profile')

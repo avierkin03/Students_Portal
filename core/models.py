@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 
 
 
@@ -18,6 +18,9 @@ class Log_User(AbstractUser):
         verbose_name="Роль"
     )
 
+    groups = models.ManyToManyField('Group', related_name='log_users_group') 
+    user_permissions = models.ManyToManyField(Permission, related_name='log_uesrs_permission')
+
     def is_moderator(self):
         return self.role == self.Roles.MODERATOR
 
@@ -26,7 +29,7 @@ class Log_User(AbstractUser):
     
 class UserProfile(models.Model):
     # Особистий кабінет користувача
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True, null=True, verbose_name="Біографія")
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -39,7 +42,7 @@ class UserProfile(models.Model):
 class Group(models.Model):
     # Група користувачів (наприклад, навчальна група, команда тощо)
     name = models.CharField(max_length=100, unique=True)
-    members = models.ManyToManyField(User, related_name="groups")
+    members = models.ManyToManyField(User, related_name="group_list")
 
     def __str__(self):
         return self.name

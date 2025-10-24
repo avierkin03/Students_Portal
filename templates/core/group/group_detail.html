@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+  <h1>{{ group.name }}</h1>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if group.description %}
+    <p><strong>Опис:</strong> {{ group.description }}</p>
+  {% endif %}
+
+  <h3>Учасники</h3>
+  {% if group.members.all %}
+    <ul>
+      {% for member in group.members.all %}
+        <li>{{ member.username }}</li>
+      {% empty %}
+        <li>У групі ще немає учасників.</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>У групі ще немає учасників.</p>
+  {% endif %}
+
+  <p><a href="{% url 'group_list' %}">Назад до списку груп</a></p>
+  <p><a href="{% url 'group_profile' group.pk %}">Профіль групи</a></p>
+{% endblock %}

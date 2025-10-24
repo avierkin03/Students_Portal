@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Група{% endblock %}
+
+{% block content %}
+  <h1>Профіль групи</h1>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <h2>{{ profile.group.name }}</h2>
+
+  {% if profile.description %}
+    <p><strong>Опис:</strong> {{ profile.description }}</p>
+  {% endif %}
+
+  {% if profile.rules %}
+    <p><strong>Правила:</strong> {{ profile.rules }}</p>
+  {% endif %}
+
+  <p><a href="{% url 'core:group_detail' %}">Перейти до детальної сторінки групи</a></p>
+
+
+  <p><a href="{% url 'core:group_profile_edit' %}">Редагувати профіль групи</a></p>
+{% endblock %}

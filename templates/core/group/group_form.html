@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Створити групу{% endblock %}
+
+{% block content %}
+  <h1>Створити групу</h1>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}<br>
+        {{ field }}
+        {{ field.errors }}
+      </p>
+    {% endfor %}
+
+    <button type="submit">Створити</button>
+  </form>
+
+  <p><a href="{% url 'group_list' %}">Повернутися до списку груп</a></p>
+{% endblock %}

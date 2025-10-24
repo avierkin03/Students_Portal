@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Список груп{% endblock %}
+
+{% block content %}
+  <h1>Групи</h1>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if groups %}
+    <ul>
+      {% for g in groups %}
+        <li>
+          <a href="{% url 'group_detail' g.pk %}">{{ g.name }}</a>
+          {% if g.description %} — {{ g.description|truncatewords:20 }}{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Груп поки що немає.</p>
+  {% endif %}
+
+  <p><a href="{% url 'group_create' %}">Створити нову групу</a></p>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Реєстрація{% endblock %}
+
+{% block content %}
+  <h1>Реєстрація</h1>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}<br>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+          <small>{{ field.help_text }}</small>
+        {% endif %}
+      </p>
+    {% endfor %}
+    <button type="submit">Зареєструватися</button>
+  </form>
+
+  <p>Вже зареєстровані? <a href="{% url 'login' %}">Увійти</a></p>
+{% endblock %}
