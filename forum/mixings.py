@@ -1,4 +1,6 @@
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.conf import settings
+from django.shortcuts import redirect
 
 
 
@@ -6,3 +8,15 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 class WorkerOwnerMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.role == 'admin'
+    
+
+class Login(LoginRequiredMixin):
+    login_url = settings.LOGIN_URL
+
+
+
+
+    def logint(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(self.login_url)
+        return super().dispatch(request, *args, **kwargs)
