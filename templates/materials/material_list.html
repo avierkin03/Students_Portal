@@ -5,15 +5,15 @@
 {% for material in materials %}
     <div class="material">
         <h2><a href="{{ material.resource }}" target="_blank">{{ material.title }}</a></h2>
-        <p><strong>Категория:</strong> {{ material.category.name }}</p>
+        <p><strong>Категорія:</strong> {{ material.category.name }}</p>
         <p>{{ material.description|truncatechars:150 }}</p>
-        <small>Добавлено: {{ material.created_at|date:"d.m.Y H:i" }}</small><br>
+        <small>Додано: {{ material.created_at|date:"d.m.Y H:i" }}</small><br>
 
         <a href = "{% url 'materials:material_update' material.pk %}">Оновити</a>
         <a href = "{% url 'materials:material_delete' material.pk %}" class = "delete-btn">Видалити</a>
     </div>
 {% empty %}
-    <p>Пока нет материалов</p>
+    <p>Поки немає навчальних материалів</p>
 {% endfor %}
 <!-- Кнопка добавления -->
 <a href="{% url 'materials:material_create' %}" class="add-btn">Додати навчальний матеріал</a>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Підтвердження видалення голосування</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Підтвердження видалення
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>
+                                <i class="fas fa-exclamation-circle me-1"></i>Увага!
+                            </strong> Цю дію неможливо скасувати.
+                        </div>
+                        
+                        <div class="voting-info mb-4 p-3 border rounded bg-light">
+                            <h5 class="text-danger">{{ voting.title }}</h5>
+                            {% if voting.description %}
+                                <p class="mb-2"><strong>Опис:</strong> {{ voting.description }}</p>
+                            {% endif %}
+                            <div class="row text-muted small">
+                                <div class="col-6">
+                                    <strong>Початок:</strong><br>
+                                    {{ voting.start_date|date:"d.m.Y H:i" }}
+                                </div>
+                                <div class="col-6">
+                                    <strong>Кінець:</strong><br>
+                                    {{ voting.end_date|date:"d.m.Y H:i" }}
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge bg-info me-2">Варіантів: {{ voting.options.count }}</span>
+                                <span class="badge bg-success">Голосів: {{ voting.votes.count }}</span>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{% url 'voting:my_votings' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>Скасувати
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-1"></i>Так, видалити
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

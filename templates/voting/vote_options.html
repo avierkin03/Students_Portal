@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Голосування в {{ voting.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'voting:voting_list' %}">Голосування</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'voting:voting_detail' voting.pk %}">{{ voting.title }}</a></li>
+                <li class="breadcrumb-item active">Голосування</li>
+            </ol>
+        </nav>
+
+        <div class="card voting-card">
+            <div class="card-header">
+                <h2 class="h4 mb-0">Голосування: {{ voting.title }}</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">{{ voting.description }}</p>
+
+                <form method="post" id="voteForm">
+                    {% csrf_token %}
+                    <div class="vote-options" id="voteOptions">
+                        {% for option in form.option.field.queryset %}
+                            <div class="vote-option" data-option-id="{{ option.id }}">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="option" 
+                                           id="option{{ option.id }}" value="{{ option.id }}">
+                                    <label class="form-check-label fw-medium" for="option{{ option.id }}">
+                                        {{ option.text }}
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Відправити голос
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const voteOptions = document.getElementById('voteOptions');
+    const optionElements = voteOptions.querySelectorAll('.vote-option');
+    
+    // Функція для вибору опції
+    function selectOption(optionElement) {
+        // Видаляємо виділення з усіх опцій
+        optionElements.forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Додаємо виділення до обраної опції
+        optionElement.classList.add('selected');
+        
+        // Встановлюємо відповідний radio button як обраний
+        const radioInput = optionElement.querySelector('input[type="radio"]');
+        radioInput.checked = true;
+    }
+    
+    // Додаємо обробники подій для кожної опції
+    optionElements.forEach(optionElement => {
+        optionElement.addEventListener('click', function() {
+            selectOption(this);
+        });
+        
+        // Також дозволяємо вибір при кліку на мітку (label)
+        const label = optionElement.querySelector('label');
+        label.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectOption(optionElement);
+        });
+    });
+    
+    // Автоматично вибираємо опцію при кліку на радіо-кнопку
+    const radioInputs = voteOptions.querySelectorAll('input[type="radio"]');
+    radioInputs.forEach(radio => {
+        radio.addEventListener('click', function() {
+            const optionElement = this.closest('.vote-option');
+            selectOption(optionElement);
+        });
+    });
+});
+</script>
+
+<style>
+.vote-option {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.vote-option:hover {
+    border-color: #2c5aa0;
+    background-color: #f8f9ff;
+    transform: translateX(5px);
+}
+
+.vote-option.selected {
+    border-color: #198754;
+    background-color: #d1edff;
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
+}
+
+.form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+</style>
+{% endblock %}

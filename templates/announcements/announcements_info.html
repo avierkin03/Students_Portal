@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load dictionary_tags %}
 {% block title %}Оголошення{% endblock %}
 {% block content %}
 
@@ -11,7 +12,16 @@
 <h1>{{ announcement.title }}</h1>
 <p>{{ announcement.text }}</p>
 <p><small>Створено: {{ announcement.create_time }}</small></p>
+<div class="emoji-reactions">
+    {% for emoji, label in emoji_choices.items %}
+        <span>
+            <a href="{% url 'announcements:add_reaction' announcement.pk emoji %}" class="{% if request.user.is_authenticated and user_reactions.0 == emoji %}selected{% endif %}">
+                {{ emoji }} {{ emoji_counts|lookup:emoji }}
+            </a>
+        </span>
+    {% endfor %}
+</div>
 <a href="{% url 'announcements:announcement_delete' announcement.pk %}">Видалити</a>
-<a href="{% url 'announcements:announcement_list' %}"> Назад до списку</a>
+<a href="{% url 'announcements:announcement_list' %}">Назад до списку</a>
 
 {% endblock %}

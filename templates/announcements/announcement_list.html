@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load dictionary_tags %}
 {% block title %}Список оголошень{% endblock %}
 {% block content %}
 
-<h1> Список оголошень </h1>
+<h1>Список оголошень</h1>
 
 <a href="{% url 'announcements:announcement_create' %}">➕ Додати оголошення</a>
 
@@ -16,12 +17,21 @@
                 style="width:100%; height:100%; object-fit:cover; display:block;"
               >
             </div>
-            <h3>{{announcement.title}}</h3>
-            <h1> {{announcement.create_time}} </h1>
+            <h3>{{ announcement.title }}</h3>
+            <p><small>{{ announcement.create_time }}</small></p>
         </a>
+        <div class="emoji-reactions">
+            {% for emoji, label in emoji_choices.items %}
+                <span>
+                    <a href="{% url 'announcements:add_reaction' announcement.pk emoji %}" class="{% if request.user.is_authenticated and user_reactions|lookup:announcement.pk == emoji %}selected{% endif %}">
+                        {{ emoji }} {{ emoji_counts|lookup:announcement.pk|lookup:emoji }}
+                    </a>
+                </span>
+            {% endfor %}
+        </div>
     {% endfor %}
 {% else %}
-    <h2> Немає оголошень! </h2>
+    <h2>Немає оголошень!</h2>
 {% endif %}
 
 {% endblock %}
