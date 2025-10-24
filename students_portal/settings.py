@@ -137,3 +137,14 @@ MEDIA_ROOT = BASE_DIR / 'static/media'
 # AUTH_USER_MODEL = "core.Log_User"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@theaterbooking.com"
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+
+# EMAIL_HOST_USER = 'твоя_адреса@gmail.com'
+# EMAIL_HOST_PASSWORD = 'пароль_додатка'
+
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

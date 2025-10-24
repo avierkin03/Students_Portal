@@ -11,4 +11,6 @@ urlpatterns = [
     path('<uuid:pk>/delete', views.EventDeleteView.as_view(), name='event-delete'), 
     path("<uuid:pk>/register/", views.register_for_event, name="event-register"),
     path("confirm-registration/<str:token>/", views.confirm_registration, name="confirm-registration"),
+    path("comments/<int:pk>/delete/", views.CommentDelete.as_view(), name="comment-delete"),
+    path("personal-calendar", views.PersonalCalendar.as_view(), name='personal-calendar')
 ]
