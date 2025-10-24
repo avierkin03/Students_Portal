@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Результати: {{ voting.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'voting_list' %}">Голосування</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'voting_detail' voting.pk %}">{{ voting.title }}</a></li>
+                <li class="breadcrumb-item active">Результати</li>
+            </ol>
+        </nav>
+
+        <div class="card voting-card">
+            <div class="card-header">
+                <h2 class="h4 mb-0">Результати: {{ voting.title }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="results-chart">
+                    {% for option, count, percentage in results %}
+                        <div class="result-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="h6 mb-0">{{ option.text }}</h5>
+                                <div>
+                                    <span class="badge bg-primary rounded-pill">{{ count }} голосів</span>
+                                    <span class="text-muted ms-2">{{ percentage }}%</span>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     aria-valuenow="{{ count }}" aria-valuemin="0" aria-valuemax="{{ total_votes }}">
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="{% url 'voting_detail' voting.pk %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Назад до голосування
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

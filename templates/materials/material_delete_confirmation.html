@@ -1,4 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="container">
+    <h1>Удалить материал?</h1>
+    <p>Вы уверены, что хотите удалить материал <strong>"{{ material.title }}"</strong>?</p>
 
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="delete-btn">Да, удалить</button>
+        <a href="{% url 'materials:material_list' %}" class="cancel-btn">Отмена</a>
+    </form>
+</div>
 {% endblock %}

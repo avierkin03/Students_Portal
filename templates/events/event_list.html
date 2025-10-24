@@ -1,4 +1,34 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="container">
+    <h1 class="page-title">ЛИСТ ПОДІЙ</h1>
+    
+    <a href="{% url 'events:event-create' %}" class="btn-dark">Створити подію</a>
 
+    <ul class="event-list">
+        {% for event in events %}
+        <li class="event-card fade-in">
+            <div class="event-info">
+                <div class="event-left">
+                    <a href="{% url 'events:event-detail' pk=event.pk %}" class="event-title">{{ event.title|upper }}</a>
+                    <span class="event-category">{{ event.get_category_display }}</span>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <li>Немає жодної події.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Пагінація -->
+    <div class="pagination">
+        {% if event.has_previous %}
+            <a href="?page={{ event.previous_page_number }}">« Назад</a>
+        {% endif %}
+        <span>Page {{ event.number }} of {{ event.paginator.num_pages }}</span>
+        {% if event.has_next %}
+            <a href="?page={{ event.next_page_number }}">Вперед »</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

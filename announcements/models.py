@@ -1,11 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.conf import settings
 
 class Announcement(models.Model):
     title = models.CharField(max_length=50)
     text = models.TextField()
     create_time = models.DateTimeField(auto_now=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="articles")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="articles")
     poster = models.ImageField(upload_to="announcements/posters", default="announcements/posters/default.jpg")
 
     class Meta():
@@ -18,21 +19,31 @@ class Announcement(models.Model):
 class AnnouncementPhoto(models.Model):
     announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to="announcements/images/", default="default.jpg")
-
-
-class EmojiLibrary(models.Model):
-    image = models.ImageField(upload_to="announcements/reactions/")
-    name = models.CharField(max_length=50, blank=True)
     
-
-class AnnouncementUserReaction(models.Model):
-    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name='reactions')
-    reaction = models.ImageField(upload_to="announcements/reactions/", default="announcements/posters/default.jpg")
-    reactions_mum = models.IntegerField()
-
 
 class AnnouncementComment(models.Model):
     announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
     create_time = models.DateTimeField(auto_now=True)
+
+
+# реакція користувача на оголошення
+class EmojiReaction(models.Model):
+    EMOJI_CHOICES = [
+        ('😊', 'Smile'),
+        ('❤️', 'Heart'),
+        ('👍', 'Thumbs Up'),
+        ('🔥', 'Fire'),
+    ]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reactions")
+    # дозволяє отримувати всі реакції для оголошення через announcement.reactions
+    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name="reactions")
+    emoji = models.CharField(max_length=10, choices=EMOJI_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'announcement')  # Один користувач може поставити лише одну реакцію на оголошення
+
+    def __str__(self):
+        return f"{self.user.username} reacted with {self.emoji} to {self.announcement.title}"

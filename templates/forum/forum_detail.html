@@ -2,4 +2,57 @@
 {% block title %}Підтвердити видалення повідомлення{% endblock %}
 {% block content %}
 
+<h2>{{ topic.name}} </h2>
+<p> {{topic.title}} </p>
+
+<p class="text-muted">
+        Створено: {{ topic.date_create|date:"d.m.Y H:i" }} | 
+        Автор: {{ topic.owner.username }}
+</p>
+
+<h5 class="mt-4">Повідомлення</h5>
+    {% if topic.posts.exists %}
+        <div class="list-group mb-4">
+            {% for post in topic.posts.all %}
+                <div class="list-group-item">
+                    <p>{{ post.text|linebreaks }}</p>
+                    <small class="text-muted">
+                        Автор: {{ post.owner_post.username }} | 
+                        Опубліковано: {{ post.date_create|date:"d.m.Y H:i" }}
+                    </small>
+                    {% if user.is_authenticated %}
+                        {% if user.profile %}
+                            {% if user == post.created_by or user.profile.role == 'moderator' or user.profile.role == 'admin' %}
+                                <a href="{% url 'forum:post_delete' post.pk %}" class="btn btn-sm btn-danger mt-2">Видалити</a>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-danger">Помилка: профіль користувача не знайдено</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="alert alert-info">У цій темі ще немає повідомлень.</p>
+    {% endif %}
+
+
+{% if user.is_authenticated %}
+<h5 class="mt-4">Додати повідомлення</h5>
+<form method="post" action="{% url 'forum:post_create' topic.pk %}" class="col-md-8">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="{{ form.text.id_for_label }}" class="form-label">Повідомлення</label>
+            {{ form.text }}
+    </div>
+        <button type="submit" class="btn btn-primary">Опублікувати</button>
+    </form>
+{% else %}
+    <div class="alert alert-warning">
+        <p>Будь ласка, <a href="{% url 'login' %}">увійдіть</a>, щоб додати повідомлення.</p>
+    </div>
+{% endif %}
+<a href="{% url 'forum:forum_list' %}" class="btn btn-secondary mt-3">Назад до списку тем</a>
+
+
 {% endblock %}
