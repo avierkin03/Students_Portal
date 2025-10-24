@@ -3,3 +3,9 @@ db.sqlite3
 __pycache__/
 polls/__pycache__/
 announcements/__pycache__/
+.idea/__pycache__/
+core/__pycache__/
+.vscode/
+.env
+forum/__pycache__/
+voting/__pycache__/
