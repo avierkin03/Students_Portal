@@ -88,13 +88,13 @@ class AnnouncementAddImage(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("announcements:announcements_router", kwargs={"announcement_id": self.object.announcement.pk})
+        return reverse("announcements:announcements_router", kwargs={"pk": self.object.announcement.pk})
     
 
 
 class AnnouncementAddComment(View):
     def post(self, request, *args, **kwargs):
-        announcement_id = kwargs.get("announcement_id")
+        announcement_id = kwargs.get("pk")
         comment_text = request.POST.get("comment")
         if comment_text:
             announcement = get_object_or_404(Announcement, pk=announcement_id)
@@ -121,7 +121,7 @@ class AnnouncementRouterView(View):
 def add_reaction(request, pk, emoji):
     announcement = get_object_or_404(Announcement, pk=pk)
     if emoji not in dict(EmojiReaction.EMOJI_CHOICES).keys():
-        return redirect('announcements:announcement_detail', pk=pk)
+        return redirect('announcements:announcements_router', pk=pk)
     
     # Видаляємо попередню реакцію користувача, якщо є
     EmojiReaction.objects.filter(user=request.user, announcement=announcement).delete()
@@ -134,4 +134,4 @@ def add_reaction(request, pk, emoji):
     )
     
     # Перенаправляємо назад до сторінки оголошення
-    return redirect('announcements:announcement_detail', pk=pk)
+    return redirect('announcements:announcements_router', pk=pk)
