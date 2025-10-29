@@ -100,6 +100,12 @@
                             </span>
                             <p class="mt-1">{{ comment.content }}</p>
                         </div>
+                        {% if request.user.is_staff %}
+                        <form action="{% url 'events:comment-delete' comment.pk %}" method="post" class="delete-form" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-small">Delete</button>
+                        </form>
+                        {% endif %}
                     {% endfor %}
                 {% else %}
                     <p class="text-muted">Ще немає коментарів. Будьте першим!</p>
@@ -111,6 +117,7 @@
                         {{ form.as_p }}
                         <button type="submit">Додати коментар</button>
                     </form>
+                    
                 {% else %}
                     <p class="text-muted mt-2">
                         <a href="{% url 'login' %}?next={{ request.path }}">Увійдіть</a>, щоб залишити коментар.

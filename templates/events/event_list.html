@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title">ЛИСТ ПОДІЙ</h1>
-    
+    <a href="{% url 'events:personal-calendar' %}" class="btn-dark">Мої події</a>
     <a href="{% url 'events:event-create' %}" class="btn-dark">Створити подію</a>
 
     <ul class="event-list">

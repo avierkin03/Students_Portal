@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="calendar-container">
+    <a href="{% url 'events:event-list' %}">← Назад до списку</a>
+    <h1>Мій календар подій</h1>
+
+    <h2>Майбутні події</h2>
+    {% if upcoming_events %}
+        <ul>
+            {% for event in upcoming_events %}
+                <li>
+                    <a href="{% url 'events:event-detail' event.pk %}">{{ event.title }}</a>
+                    — {{ event.date|date:"d.m.Y H:i" }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Немає запланованих подій.</p>
+    {% endif %}
+
+    <h2>Минулі події</h2>
+    {% if past_events %}
+        <ul>
+            {% for event in past_events %}
+                <li>
+                    <a href="{% url 'events:event-detail' event.pk %}">{{ event.title }}</a>
+                    — {{ event.date|date:"d.m.Y H:i" }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Немає минулих подій.</p>
+    {% endif %}
+</div>
+{% endblock %}

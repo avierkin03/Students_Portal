@@ -3,6 +3,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
+from django.utils import timezone
 from django.core.mail import send_mail
 from .models import Events, EventComment, EventRegistration
 from .forms import EventForm, CommentForm
@@ -87,7 +91,7 @@ class EventUpdateView(LoginRequiredMixin, UserIsOwnerMixin, UpdateView):
 class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Events
     success_url = reverse_lazy('events:event-list')
-    template_name = 'events\event_delete_confirmation.html'
+    template_name = 'events/event_delete_confirmation.html'
     def test_func(self):
         event = self.get_object()
         return self.request.user == event.created_by or self.request.user.is_staff
@@ -112,7 +116,20 @@ def register_for_event(request, pk):
         confirm_url = request.build_absolute_uri(
             f"/events/confirm-registration/{registration.confirmation_token}/"
         )
-
+        # email_title = "Event Confirmation"
+        # html_content = render_to_string("events/confirmation_email.html", {
+        #     'event': event.title,
+        #     'user-name': user.username
+        # })
+        # text_content = strip_tags(html_content)
+        # email = EmailMultiAlternatives(
+        #     email_title,
+        #     text_content,
+        #     settings.EMAIL_HOST_USER,
+        #     [user.email],
+        # )
+        # email.attach_alternative(html_content, "text/html")
+        # email.send()
         send_mail(
             subject=f"Підтвердження реєстрації на {event.title}",
             message=f"Вітаємо, {user.username}! Щоб підтвердити участь, перейдіть за посиланням: {confirm_url}",
@@ -140,3 +157,34 @@ def confirm_registration(request, token):
 
     return redirect("events:event-detail", pk=registration.event.pk)
 
+class CommentDelete(UserPassesTestMixin, View):
+    model = EventComment
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser or self.request.user == self.object.author
+    def post(self, request, pk):
+        comment = get_object_or_404(EventComment, pk=pk)
+        event_pk = comment.event.pk
+        comment.delete()
+        return redirect('events:event-detail', pk=event_pk)
+
+class PersonalCalendar(LoginRequiredMixin, ListView):
+    model = Events
+    template_name = 'events/personal_calendar.html'
+    context_object_name = 'events'
+    ordering = ['date']
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Events.objects.filter(
+            registrations__user=user, 
+            registrations__is_confirmed=True
+        ).order_by('date')
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['upcoming_events'] = self.get_queryset().filter(date__gte=timezone.now())
+        context['past_events'] = self.get_queryset().filter(date__lt=timezone.now())
+        return context
+
+        
